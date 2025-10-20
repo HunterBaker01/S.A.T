@@ -6,11 +6,12 @@ class MyVGG16(nn.Module):
         super().__init__()
         model = vgg16(pretrained=True)
 
-        self.feature= model.features
+         self.feature= nn.Sequential(*list(model.features.children())[:-1])
 
         if freeze_features:
             for param in self.feature.parameters():
                 param.requires_grad = False
+
     def forward(self, x):
         x = self.feature(x)
         return x
