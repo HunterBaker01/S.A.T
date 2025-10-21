@@ -13,5 +13,5 @@ class MyVGG16(nn.Module):
                 param.requires_grad = False
 
     def forward(self, x):
-        x = self.feature(x)
+        x = self.feature(x) # [batch_size, 512, 14, 14]
         return x

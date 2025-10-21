@@ -1,14 +1,15 @@
 from torch.nn import LSTM
+from torch import nn
 
-class MyLSTM(LSTM):
-    def __init__(self, vocab_size, embedding_dim, hidden_dim, num_layers=1):
+class MyLSTM(nn.Module):
+    def __init__(self, input_size, hidden_dim, num_layers=1):
         super(MyLSTM, self).__init__()
-        self.embedding = nn.Embedding(vocab_size, embedding_dim)
-        self.lstm = LSTM(embedding_dim, hidden_dim, num_layers, batch_first=True)
+        self.lstm = LSTM(input_size, hidden_dim, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_dim, vocab_size)
 
-    def forward(self, x, hidden):
-        x = self.embedding(x)
-        out, hidden = self.lstm(x, hidden)
-        out = self.fc(out)
-        return out, hidden
+    def forward(self, x):
+        batch_size = x.size(0)
+        x = x.view(batch_size, 512, 14*14).permute(0, 2, 1) # [batch, 196, 512]
+        out, hidden = self.lstm(x)
+        out = self.fc(out) # [batch, 196, vocab_size]
+        return out
