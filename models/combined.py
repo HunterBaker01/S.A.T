@@ -9,5 +9,5 @@ class CombinedModel(nn.Module):
 
     def forward(self, images, captions):
         features = self.encoder(images)
-        outputs, _ = self.decoder(captions, None)
+        outputs = self.decoder(features, captions)
         return outputs
