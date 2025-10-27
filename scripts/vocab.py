@@ -11,7 +11,6 @@ class Vocabulary:
 
     def __len__(self):
         return len(self.toks)
-
     def tockenizer(self, text):
         "Standardize the data"
         text = text.lower()
@@ -40,16 +39,16 @@ class Vocabulary:
                 numerical.append(self.ind["unk"])
         return numerical
 
-    def parse_tokens(file):
-        imgid2captions = {}
-        with open(file, "r", encoding="utf-8") as f:
-            reader = csv.reader(f)
-            next(reader, None)
-            for row in reader:
-                if len(row) < 2:
-                    continue
-                img_id, caption = row[0], row[1]
-                if img_id not in imgid2captions:
-                    imgid2captions[img_id] = []
-                imgid2captions[img_id].append(caption)
-        return imgid2captions
+def parse_tokens(file):
+    imgid2captions = {}
+    with open(file, "r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        next(reader, None)
+        for row in reader:
+            if len(row) < 2:
+                continue
+            img_id, caption = row[0], row[1]
+            if img_id not in imgid2captions:
+                imgid2captions[img_id] = []
+            imgid2captions[img_id].append(caption)
+    return imgid2captions
