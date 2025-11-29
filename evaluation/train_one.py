@@ -1,7 +1,5 @@
 from tqdm import tqdm
 
-DEVICE = "cuda"
-
 def train_epoch(model, dataloader, criterion, optimizer, vocab_size, epoch):
     model.train()
     total_loss = 0
