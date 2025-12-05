@@ -111,6 +111,7 @@ class Flickr8kDataset(Dataset):
         self.imgid2captions = []
         self.transform = transform
         self.vocab = vocab
+        self.images_dir = images_dir
 
         for img_id, caps in imgid2captions.items():
             for c in caps:
@@ -121,7 +122,7 @@ class Flickr8kDataset(Dataset):
 
     def __getitem__(self, idx):
         img_id, caption = self.imgid2captions[idx]
-        img_path = os.path.join(images_dir, img_id)
+        img_path = os.path.join(self.images_dir, img_id)
         image = Image.open(img_path).convert("RGB")
         if self.transform:
             image = self.transform(image)
@@ -178,25 +179,25 @@ def build_vocab(tokens_file, min_word_freq, vocab_path):
     test_dict= {iid: imgid2captions[iid] for iid in test_ids}
     return train_dict, test_dict, vocab
 
-def get_loaders(train_dict, test_dict, vocab, transform):
+def get_loaders(train_dict, test_dict, vocab, transform, batch_size=16, num_workers=4, collate_fn=None):
     train_dataset = Flickr8kDataset(train_dict, vocab, transform=None)
     test_dataset = Flickr8kDataset(test_dict, vocab, transform=None)
 
     train_loader = DataLoader(
         train_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=True,
         collate_fn=collate_fn,
         drop_last=False,
-        num_workers=NUM_WORKERS,
+        num_workers=num_workers,
     )
 
     test_loader= DataLoader(
         test_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=True,
         collate_fn=collate_fn,
         drop_last=False,
-        num_workers=NUM_WORKERS,
+        num_workers=num_workers,
     )
     return train_loader, test_loader
