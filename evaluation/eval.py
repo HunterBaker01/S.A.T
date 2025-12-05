@@ -1,4 +1,12 @@
+from torch import nn
+from torch import optim
 from tqdm import tqdm
+
+def loss_function(ignore_index):
+    return nn.CrossEntropyLoss(ignore_index=ignore_index)
+
+def get_optim(parameters, lr):
+    return optim.Adam(parameters=parameters, lr=lr)
 
 def train_epoch(model, dataloader, criterion, optimizer, vocab_size, epoch):
     model.train()
