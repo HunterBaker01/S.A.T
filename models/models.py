@@ -4,6 +4,9 @@ from torch.nn import LSTM
 from torch import cat
 
 class MyVGG16(nn.Module):
+    """
+    :param freeze_features: use the pretrained vgg16 or not
+    """
     def __init__(self, freeze_features=True):
         super().__init__()
         model = vgg16(weights="DEFAULT")
@@ -33,10 +36,10 @@ class MyLSTM(nn.Module):
         self.fc = nn.Linear(hidden_dim, vocab_size)
 
     def forward(self, features, captions):
-        captions_in = captions[:, :-1]
+        captions_in = captions[:, :-1] # Don't let the model see the answer
         emb = self.embedding(captions_in)
         features = features.unsqueeze(1)
-        lstm_input = cat((features, emb), dim=1)
+        lstm_input = cat((features, emb), dim=1) # Input both the output of the cnn and the embedded caption
         outputs, _ = self.lstm(lstm_input)
         outputs = self.fc(outputs)
         return outputs

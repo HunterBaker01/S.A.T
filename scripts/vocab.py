@@ -4,29 +4,32 @@ import csv
 
 class Vocabulary:
     def __init__(self, freq_threshold=5):
+        """
+        :param freq_threshold: number of times a word must appear to be added to the vocab
+        """
         self.freq_threshold = freq_threshold
-        self.toks = {0: "pad", 1: "sos", 2: "eos", 3: "unk"}
-        self.ind = {v: k for k, v in self.toks.items()}
-        self.index = 4
+        self.toks = {0: "pad", 1: "sos", 2: "eos", 3: "unk"} # Predefined tokens
+        self.ind = {v: k for k, v in self.toks.items()} # reversed positions of the above
+        self.index = 4 # starting point for the new vocab
 
     def __len__(self):
         return len(self.toks)
+
     def tockenizer(self, text):
-        "Standardize the data"
         text = text.lower()
-        tockens = re.findall(r"\w+", text)
+        tockens = re.findall(r"\w+", text) # make each word a token
         return tockens
 
     def build_vocab(self, sentence_list):
         frequencies = Counter()
         for sentence in sentence_list:
             tokens = self.tockenizer(sentence)
-            frequencies.update(tokens)
+            frequencies.update(tokens) # update how often a word is used
 
         for word, freq in frequencies.items():
             if freq >= self.freq_threshold:
-                self.ind[word] = self.index
-                self.toks = [self.index] = word
+                self.ind[word] = self.index # update the dict that holds the tokens
+                self.toks[self.index] = word
                 self.index += 1
 
     def numerical(self, text):
