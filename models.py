@@ -11,7 +11,7 @@ class MyVGG16(nn.Module):
         super().__init__()
         model = vgg16(weights="DEFAULT")
 
-        self.feature= nn.Sequential(*list(model.features.children()))
+        self.feature = nn.Sequential(*list(model.features.children()))
 
         if freeze_features:
             for param in self.feature.parameters():

@@ -8,13 +8,13 @@ def loss_function(ignore_index):
 def get_optim(parameters, lr):
     return optim.Adam(parameters=parameters, lr=lr)
 
-def train_epoch(model, dataloader, criterion, optimizer, vocab_size, epoch):
+def train_epoch(model, dataloader, criterion, optimizer, vocab_size, epoch, device):
     model.train()
     total_loss = 0
     progress_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}", unit="batch")
     for images, captions, _lengths in progress_bar:
-        images = images.to(DEVICE)
-        captions = captions.to(DEVICE)
+        images = images.to(device)
+        captions = captions.to(device)
         
         optimizer.zero_grad()
         outputs = model(images, captions)
@@ -36,8 +36,8 @@ def test(model, dataloader, criterion, vocab_size):
     total_loss = 0
     with torch.no_grad():
         for images, captions, _lengths in dataloader:
-            images = images.to(DEVICE)
-            captions = captions.to(DEVICE)
+            images = images.to(device)
+            captions = captions.to(device)
             outputs = model(images, captions)
             outputs = outputs[:, 1:, :].contiguous().view(-1, vocab_size)
             targets = captions[:, 1:].contiguous().view(-1)
