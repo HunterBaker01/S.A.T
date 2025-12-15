@@ -100,7 +100,7 @@ def parse_tokens(file):
     return imgid2captions
 
 class Flickr8kDataset(Dataset):
-    def __init__(self, imgid2captions, vocab, transform=None, images_dir="data/Images"):
+    def __init__(self, imgid2captions, vocab, h5_path):
         """
         :param imgid2captions: dict mapping image id to the caption
         :param vocab: the vocabulary to use for training the model
@@ -108,30 +108,34 @@ class Flickr8kDataset(Dataset):
         :param images_dir: directory containing the images
         """
 
-        self.imgid2captions = []
-        self.transform = transform
+        self.samples = []
         self.vocab = vocab
-        self.images_dir = images_dir
+        self.h5_path = h5_path
+        self.h5f = None
 
         for img_id, caps in imgid2captions.items():
             for c in caps:
-                self.imgid2captions.append((img_id, c))
+                self.samples.append((img_id, c))
 
     def __len__(self):
-        return len(self.imgid2captions)
+        return len(self.samples)
 
     def __getitem__(self, idx):
-        img_id, caption = self.imgid2captions[idx]
-        img_path = os.path.join(self.images_dir, img_id)
-        image = Image.open(img_path).convert("RGB")
-        if self.transform:
-            image = self.transform(image)
+        if self.h5f is None:
+            self.h5f = h5py.File(self.h5_path, "r")
+
+        img_id, caption = self.samples[idx]
+
+        features = torch.tensor(
+            self.h5f[img_id][:],
+            dtype=torch.float32
+        )
 
         numerical_caption = [self.vocab.ind["sos"]]
         numerical_caption += self.vocab.numerical(caption)
         numerical_caption.append(self.vocab.ind["eos"])
 
-        return image, torch.tensor(numerical_caption, dtype=torch.long)
+        return features, torch.tensor(numerical_caption, dtype=torch.long)
 
     def collate_fn(batch):
         """
