@@ -9,6 +9,15 @@ def get_optim(parameters, lr):
     return optim.Adam(parameters=parameters, lr=lr)
 
 def train_epoch(model, dataloader, criterion, optimizer, vocab_size, epoch, device):
+    """
+    :param model: model to train, if the encodere is already pretrained just the decoder goes here
+    :param dataloader: training dataset
+    :param criterion: the loss function
+    :param optimizer: optimizer to use
+    :param vocab_size: size of the vocabulary that has been built
+    :param epoch: current epoch
+    :param device: the device to train on (GPU in this case)
+    """
     model.train()
     total_loss = 0
     progress_bar = tqdm(dataloader, desc=f"Epoch {epoch+1}", unit="batch")

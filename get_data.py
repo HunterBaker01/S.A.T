@@ -179,9 +179,9 @@ def build_vocab(tokens_file, min_word_freq, vocab_path):
     test_dict= {iid: imgid2captions[iid] for iid in test_ids}
     return train_dict, test_dict, vocab
 
-def get_loaders(train_dict, test_dict, vocab, transform, batch_size=16, num_workers=4, collate_fn=None):
-    train_dataset = Flickr8kDataset(train_dict, vocab, transform=None)
-    test_dataset = Flickr8kDataset(test_dict, vocab, transform=None)
+def get_loaders(train_dict, test_dict, vocab, transform, image_dir="data/Images", batch_size=16, num_workers=4, collate_fn=None):
+    train_dataset = Flickr8kDataset(train_dict, vocab, transform=None, image_dir=image_dir)
+    test_dataset = Flickr8kDataset(test_dict, vocab, transform=None, image_dir=image_dir)
 
     train_loader = DataLoader(
         train_dataset,
