@@ -9,6 +9,7 @@ import os
 import torch
 import pickle
 import random
+import h5py
 
 class ImageCaptionDataset(Dataset):
     def __init__(self, image_dir, captions_file, transform=None):
@@ -183,9 +184,9 @@ def build_vocab(tokens_file, min_word_freq, vocab_path):
     test_dict= {iid: imgid2captions[iid] for iid in test_ids}
     return train_dict, test_dict, vocab
 
-def get_loaders(train_dict, test_dict, vocab, transform, image_dir="data/Images", batch_size=16, num_workers=4, collate_fn=None):
-    train_dataset = Flickr8kDataset(train_dict, vocab, transform=None, image_dir=image_dir)
-    test_dataset = Flickr8kDataset(test_dict, vocab, transform=None, image_dir=image_dir)
+def get_loaders(train_dict, test_dict, vocab, transform, h5_path="features.h5", batch_size=16, num_workers=4, collate_fn=None):
+    train_dataset = Flickr8kDataset(train_dict, vocab, h5_path=h5_path)
+    test_dataset = Flickr8kDataset(test_dict, vocab, h5_path=h5_path)
 
     train_loader = DataLoader(
         train_dataset,
@@ -204,4 +205,5 @@ def get_loaders(train_dict, test_dict, vocab, transform, image_dir="data/Images"
         drop_last=False,
         num_workers=num_workers,
     )
+
     return train_loader, test_loader

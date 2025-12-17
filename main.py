@@ -10,14 +10,14 @@ HIDDEN_DIM = 512
 LEARNING_RATE = 0.001
 BATCH_SIZE = 64
 EPOCHS = 5
-MIN_WORD_FREQ = 5
+MIN_WORD_FREQ = 2
 SEED = 42
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 NUM_WORKERS = 4
  
 IMAGES_DIR = "data/Images"
 TOKENS_FILE = "data/captions.txt"
-HDF5_FILE = "features.h5"
+HDF5_FILE = "data/features.h5"
  
 BEST_CHECKPOINT_PATH = "best_checkpoint.pth"
 FINAL_MODEL_PATH = "final_model.pth"
@@ -37,14 +37,18 @@ def main():
     train_dict, test_dict, vocab = build_vocab(TOKENS_FILE, MIN_WORD_FREQ, VOCAB_PATH)
     vocab_size = len(vocab)
 
-    train_loader, test_loader = get_loaders(train_dict, test_dict, vocab, transform)
+    train_loader, test_loader = get_loaders(train_dict,
+                                            test_dict,
+                                            vocab,
+                                            HDF5_FILE)
 
     encoder = MyVGG16()
     decoder = MyLSTM(EMBED_DIM, HIDDEN_DIM, vocab_size)
 
-    optimizer = optim.Adam(model.parameters(), LEARNING_RATE)
+    optimizer = optim.Adam(decoder.parameters(), LEARNING_RATE)
     criterion = nn.CrossEntropyLoss()
 
+    min_loss = 10000
     for epoch in range(EPOCHS):
         loss = train_epoch(model=decoder,
                     dataloader=train_loader,
@@ -53,4 +57,7 @@ def main():
                     vocab_size=vocab_size,
                     epoch=epoch,
                     device=DEVICE)
+        if loss < min_loss:
+            min_loss = loss
 
+    print(min_loss)
