@@ -42,7 +42,36 @@ class MyLSTM(nn.Module):
         lstm_input = cat((features, emb), dim=1) # Input both the output of the cnn and the embedded caption
         outputs, _ = self.lstm(lstm_input)
         outputs = self.fc(outputs)
+
         return outputs
+
+    def generate(self, features, max_len=20, start_idx=1, end_idx=2):
+        """
+        Generates captions for validation, so no teacher forcing
+        :param features: features from the encoder
+        :param max_len: max length of the sequence before stopping
+        :param start_idx: start of the sequence
+        :param end_idx: end of the sequence
+        """
+        captions = []
+
+        inputs = features.unsqueeze(1)
+        states = None
+
+        for _ in range(max_len):
+            outputs, states = self.lstm(inputs, states)
+            logits = self.fc(outputs.squeeze(1))
+
+            predicted = logits.argmax(dim=1)
+            captions.append(predicted)
+
+            if (predicted == end_idx).all():
+                break
+
+            inputs = self.embedding(predicted).unsqueeze(1)
+
+        captions = torch.stack(captions, dim=1)
+        return captions
 
 class CombinedModel(nn.Module):
     def __init__(self, encoder, decoder):

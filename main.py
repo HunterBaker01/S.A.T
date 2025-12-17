@@ -1,7 +1,7 @@
 import torch
 from torch import nn, optim
 from torchvision import transforms
-from models import MyVGG16, MyLSTM, CombinedModel
+from models import MyVGG16, MyLSTM
 from get_data import build_vocab, get_loaders, Flickr8kDataset
 from eval import train_epoch
 
@@ -17,6 +17,7 @@ NUM_WORKERS = 4
  
 IMAGES_DIR = "data/Images"
 TOKENS_FILE = "data/captions.txt"
+HDF5_FILE = "features.h5"
  
 BEST_CHECKPOINT_PATH = "best_checkpoint.pth"
 FINAL_MODEL_PATH = "final_model.pth"
@@ -40,17 +41,16 @@ def main():
 
     encoder = MyVGG16()
     decoder = MyLSTM(EMBED_DIM, HIDDEN_DIM, vocab_size)
-    model = CombinedModel(encoder, decoder).to(DEVICE)
 
     optimizer = optim.Adam(model.parameters(), LEARNING_RATE)
     criterion = nn.CrossEntropyLoss()
 
     for epoch in range(EPOCHS):
-        loss = train_epoch(model,
-                    train_loader,
-                    criterion,
-                    optimizer,
-                    vocab_size,
-                    epoch)
-        print(loss)
+        loss = train_epoch(model=decoder,
+                    dataloader=train_loader,
+                    criterion=criterion,
+                    optimizer=optimizer,
+                    vocab_size=vocab_size,
+                    epoch=epoch,
+                    device=DEVICE)
 
