@@ -1,6 +1,5 @@
 import os
 import h5py
-import numpy as np
 import torch
 from torchvision import transforms
 from PIL import Image
@@ -15,7 +14,7 @@ transforms.Normalize(
     ),
 ])
 
-def extract_features(image_path):
+def extract_features(image_path, encoder, device):
   image = Image.open(image_path).convert("RGB")
   image = transform(image).unsqueeze(0).to(device)
 
@@ -30,9 +29,9 @@ def reshape_features(features):
   features = features.view(-1, 512) # Works for our model, needs changing if you change the output size of the encoder
   return features
 
-def save_to_h5(model, image_dir, device, save_path="features.h5"):
-    model.eval()
-    for p in model.parameters():
+def save_to_h5(encoder, image_dir, device, save_path="features.h5"):
+    encoder.eval()
+    for p in encoder.parameters():
         p.requires_grad = False
 
     image_id_to_path = {}
@@ -46,7 +45,7 @@ def save_to_h5(model, image_dir, device, save_path="features.h5"):
 
     with h5py.File(save_path, "w") as h5f:
       for image_id, image_path in image_id_to_path.items():
-        raw_features = extract_features(image_path)
+        raw_features = extract_features(image_path, encoder, device)
         features = reshape_features(raw_features)
         
         h5f.create_dataset(

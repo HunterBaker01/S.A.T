@@ -4,6 +4,8 @@ from torchvision import transforms
 from models import MyVGG16, MyLSTM
 from get_data import build_vocab, get_loaders, Flickr8kDataset
 from eval import train_epoch
+from create_h5 import save_to_h5
+import os
 
 EMBED_DIM = 256
 HIDDEN_DIM = 512
@@ -42,7 +44,10 @@ def main():
                                             vocab,
                                             HDF5_FILE)
 
-    encoder = MyVGG16()
+    if not os.path.isfile(HDF5_FILE):
+        encoder = MyVGG16()
+        save_to_h5(encoder, IMAGES_DIR, DEVICE, HDF5_FILE)
+
     decoder = MyLSTM(EMBED_DIM, HIDDEN_DIM, vocab_size)
 
     optimizer = optim.Adam(decoder.parameters(), LEARNING_RATE)
@@ -59,5 +64,3 @@ def main():
                     device=DEVICE)
         if loss < min_loss:
             min_loss = loss
-
-    print(min_loss)

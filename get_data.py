@@ -59,15 +59,15 @@ class Vocabulary:
     def __len__(self):
         return len(self.toks)
 
-    def tockenizer(self, text):
+    def tokenizer(self, text):
         text = text.lower()
-        tockens = re.findall(r"\w+", text) # make each word a token
-        return tockens
+        tokens = re.findall(r"\w+", text) # make each word a token
+        return tokens
 
     def build_vocab(self, sentence_list):
         frequencies = Counter()
         for sentence in sentence_list:
-            tokens = self.tockenizer(sentence)
+            tokens = self.tokenizer(sentence)
             frequencies.update(tokens) # update how often a word is used
 
         for word, freq in frequencies.items():
@@ -77,7 +77,7 @@ class Vocabulary:
                 self.index += 1
 
     def numerical(self, text):
-        tokens = self.tockenizer(text)
+        tokens = self.tokenizer(text)
         numerical = []
         for token in tokens:
             if token in self.ind:
@@ -184,7 +184,7 @@ def build_vocab(tokens_file, min_word_freq, vocab_path):
     test_dict= {iid: imgid2captions[iid] for iid in test_ids}
     return train_dict, test_dict, vocab
 
-def get_loaders(train_dict, test_dict, vocab, transform, h5_path="features.h5", batch_size=16, num_workers=4, collate_fn=None):
+def get_loaders(train_dict, test_dict, vocab, h5_path="features.h5", batch_size=16, num_workers=4, collate_fn=None):
     train_dataset = Flickr8kDataset(train_dict, vocab, h5_path=h5_path)
     test_dataset = Flickr8kDataset(test_dict, vocab, h5_path=h5_path)
 
