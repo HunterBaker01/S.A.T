@@ -18,7 +18,7 @@ class MyVGG16(nn.Module):
                 param.requires_grad = False
 
     def forward(self, x):
-        x = self.feature(x) # [batch_size, 512, 7, 7]
+        x = self.feature(x)
         return x
 
 class MyLSTM(nn.Module):
@@ -36,10 +36,10 @@ class MyLSTM(nn.Module):
         self.fc = nn.Linear(hidden_dim, vocab_size)
 
     def forward(self, features, captions):
-        captions_in = captions[:, :-1] # Don't let the model see the answer
+        captions_in = captions[:, :-1]
         emb = self.embedding(captions_in)
         features = features.unsqueeze(1)
-        lstm_input = cat((features, emb), dim=1) # Input both the output of the cnn and the embedded caption
+        lstm_input = cat((features, emb), dim=1)
         outputs, _ = self.lstm(lstm_input)
         outputs = self.fc(outputs)
 
@@ -72,14 +72,3 @@ class MyLSTM(nn.Module):
 
         captions = torch.stack(captions, dim=1)
         return captions
-
-class CombinedModel(nn.Module):
-    def __init__(self, encoder, decoder):
-        super().__init__()
-        self.encoder = encoder
-        self.decoder = decoder
-
-    def forward(self, images, captions):
-        features = self.encoder(images)
-        outputs = self.decoder(features, captions)
-        return outputs
