@@ -12,6 +12,7 @@ Usage:
 """
 
 import os
+import random
 import torch
 from torch import nn, optim
 from torchvision import transforms
@@ -57,6 +58,7 @@ transform = transforms.Compose([
 def main():
     """Run the full training pipeline."""
     torch.manual_seed(SEED)
+    random.seed(SEED)
 
     # Step 1: Build vocabulary and split data
     train_dict, test_dict, vocab = build_vocab(TOKENS_FILE, MIN_WORD_FREQ, VOCAB_PATH)
@@ -68,6 +70,8 @@ def main():
         encoder = MyVGG16()
         encoder = encoder.to(DEVICE)
         save_to_h5(encoder, IMAGES_DIR, DEVICE, HDF5_FILE)
+        del encoder
+        torch.cuda.empty_cache()
         print(f"Features saved to {HDF5_FILE}")
 
     # Step 3: Create data loaders

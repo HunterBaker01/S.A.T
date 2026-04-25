@@ -21,6 +21,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as transforms
+from PIL import Image
 
 
 class ImageCaptionDataset(Dataset):
@@ -63,11 +64,10 @@ class ImageCaptionDataset(Dataset):
     def __getitem__(self, idx):
         image_id = self.image_ids[idx]
         image_path = os.path.join(self.image_dir, image_id)
-        from PIL import Image
         image = Image.open(image_path).convert("RGB")
         if self.transform:
             image = self.transform(image)
-        caption = np.random.choice(self.captions[image_id])
+        caption = random.choice(self.captions[image_id])
         return image, caption
 
 
